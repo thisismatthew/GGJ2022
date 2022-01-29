@@ -17,6 +17,8 @@ public enum Outfit
 }*/
 public class OutfitPicker : MonoBehaviour
 {
+    public BlobManager BM;
+
     public List<GameObject> Hats;
     public List<GameObject> Outfits;
 
@@ -66,6 +68,7 @@ public class OutfitPicker : MonoBehaviour
                 hatIndex = Hats.Count - 1;
             }
         }
+        BM.hatIndex = hatIndex;
     }
 
     public void CycleOutfit(bool up)
@@ -86,5 +89,7 @@ public class OutfitPicker : MonoBehaviour
                 outfitIndex = Outfits.Count - 1;
             }
         }
+
+        BM.outfitIndex = outfitIndex;
     }
 }

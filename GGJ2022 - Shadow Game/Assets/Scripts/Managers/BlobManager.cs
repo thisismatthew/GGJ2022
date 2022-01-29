@@ -10,6 +10,8 @@ public class BlobManager : MonoBehaviour
     public TextMeshProUGUI TitleUI;
     public CinemachineVirtualCamera Cam;
     public GameObject PickerUI, PickingBackgroundUI;
+    public int hatIndex, outfitIndex;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +29,16 @@ public class BlobManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public int GetCurrentHatIndex()
+    {
+        return hatIndex;
+    }
+
+    public int GetCurrentOutfitIndex()
+    {
+        return outfitIndex;
     }
 
     public void OnBlobReady()

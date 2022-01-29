@@ -10,6 +10,14 @@ public class ShadowManager : MonoBehaviour
 
     public CinemachineVirtualCamera Cam;
     public GameObject ShadowUI;
+    public PlayerMovement PlayerMover;
+    public Color MovingClr, StoppedClr;
+
+    public List<Sprite> ShadowHats;
+    public List<Sprite> ShadowOutfits;
+
+    public SpriteRenderer Hat,Outfit,Face;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +32,31 @@ public class ShadowManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SpriteRenderer[] sprites = PlayerMover.GetComponentsInChildren<SpriteRenderer>();
+        if (PlayerMover.Moving)
+        {
+             foreach(SpriteRenderer spr in sprites)
+             {
+               spr.color = MovingClr;
+             }
+        }
+        else
+        {
+            foreach (SpriteRenderer spr in sprites)
+            {
+                spr.color = StoppedClr;
+            }
+        }
+        Face.color = StoppedClr;
+    }
 
+    public void UpdateShadowOutfit(int outfitIndex)
+    {
+        Outfit.sprite = ShadowOutfits[outfitIndex];
+    }
+
+    public void UpdateShadowHat(int hatIndex)
+    {
+        Hat.sprite = ShadowHats[hatIndex];
     }
 }
