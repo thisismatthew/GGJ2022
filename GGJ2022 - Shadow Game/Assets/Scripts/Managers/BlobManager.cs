@@ -65,14 +65,7 @@ public class BlobManager : MonoBehaviour
     //TODO Wait for dialogue event
     public void OnBlobReady()
     {
-        PickerUI.SetActive(false);
-        PickingBackgroundUI.SetActive(false);
-        Cam.Follow = controller.gameObject.transform;
-        Cam.LookAt = controller.gameObject.transform;
         ClothesReady = true;
-        //create data packet to send to game manager with outfit details
-        //signal that the hider only has a few moments to hide
-        //put up a counter for both players. 
     }
 
     public async Task WaitForPick()

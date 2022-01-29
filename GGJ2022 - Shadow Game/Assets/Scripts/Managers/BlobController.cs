@@ -12,6 +12,7 @@ public class BlobController : MonoBehaviour
     private Rigidbody2D rb;
     public bool Moving;
     public ShadowDetector Detector;
+    
 
     //public Color c_moving, c_stopped;
 
@@ -28,7 +29,7 @@ public class BlobController : MonoBehaviour
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
 
-        Debug.Log(inputDir);
+        //Debug.Log(inputDir);
         inputDir = new Vector2(horizontal, vertical).normalized;
         if (inputDir != Vector2.zero)
         {
@@ -41,4 +42,6 @@ public class BlobController : MonoBehaviour
             rb.velocity = Vector2.zero;
         }
     }
+
+
 }

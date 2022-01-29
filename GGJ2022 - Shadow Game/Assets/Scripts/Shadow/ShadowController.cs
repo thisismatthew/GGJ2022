@@ -11,6 +11,8 @@ public class ShadowController : MonoBehaviour
     private Vector2 inputDir;
     private Rigidbody2D rb;
     public bool Moving;
+    private PhotonView _photonView;
+
     //public Color c_moving, c_stopped;
 
     void Start()
@@ -22,11 +24,12 @@ public class ShadowController : MonoBehaviour
     void FixedUpdate()
     {
         if (PhotonNetwork.NickName != "Shadow") return;
+        
 
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
 
-        Debug.Log(inputDir);
+
         inputDir = new Vector2(horizontal, vertical).normalized;
         if (inputDir != Vector2.zero)
         {

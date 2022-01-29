@@ -8,19 +8,17 @@ using System.Threading.Tasks;
 public class PhotonTimer : MonoBehaviour
 {
     bool ticking = false;
-    double timerIncrementValue;
+    int timerIncrementValue;
     double startTime;
     double timer;
     ExitGames.Client.Photon.Hashtable CustomeValue;
     private TextMeshProUGUI tmp;
+    public int countdown = 0;
+    public bool TimesUp = false;
 
     private void Start()
     {
         tmp = GetComponent<TextMeshProUGUI>();
-    }
-    private void StartTimer(double _timer)
-    {
-        timer = _timer;
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             CustomeValue = new ExitGames.Client.Photon.Hashtable();
@@ -36,23 +34,28 @@ public class PhotonTimer : MonoBehaviour
         }
     }
 
-    public async Task Timer(double _time) 
+
+    private void Update()
     {
-        
-        StartTimer(_time);
-        while (ticking)
+        if (!ticking) return;
+        timerIncrementValue = (int)(PhotonNetwork.Time - startTime);
+        if (timerIncrementValue < countdown)
         {
-            timerIncrementValue = PhotonNetwork.Time - startTime;
-            tmp.text = "Countdown: " + (timer - (int)timerIncrementValue).ToString();
-
-            await Task.Yield();
-
-            if (timerIncrementValue >= timer)
-            {
-                tmp.text = "";
-                ticking = false;
-            }
+            tmp.text = (countdown - timerIncrementValue).ToString();
         }
-
+        else
+        {
+            tmp.text = "";
+            TimesUp = true;
+        }
+            
     }
+
+    public void SetTimer(int duration)
+    {
+        TimesUp = false;
+        countdown = timerIncrementValue + duration;
+    }
+    //lets set the timer to run forever, and we'll just update for our increment. 
+
 }
