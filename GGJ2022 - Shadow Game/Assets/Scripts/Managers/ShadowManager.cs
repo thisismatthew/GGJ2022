@@ -50,11 +50,13 @@ public class ShadowManager : MonoBehaviour
         Face.color = StoppedClr;
     }
 
+    [PunRPC]
     public void UpdateShadowOutfit(int outfitIndex)
     {
         Outfit.sprite = ShadowOutfits[outfitIndex];
     }
 
+    [PunRPC]
     public void UpdateShadowHat(int hatIndex)
     {
         Hat.sprite = ShadowHats[hatIndex];

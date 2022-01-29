@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 /*public enum Hat
 {
@@ -17,6 +18,7 @@ public enum Outfit
 }*/
 public class OutfitPicker : MonoBehaviour
 {
+    private PhotonView _photonView;
     public BlobManager BM;
 
     public List<GameObject> Hats;
@@ -25,6 +27,10 @@ public class OutfitPicker : MonoBehaviour
     public int hatIndex = 0;
     public int outfitIndex = 0;
 
+    private void Start()
+    {
+        _photonView = PhotonView.Get(this);
+    }
 
     private void Update()
     {
@@ -68,7 +74,9 @@ public class OutfitPicker : MonoBehaviour
                 hatIndex = Hats.Count - 1;
             }
         }
-        BM.hatIndex = hatIndex;
+        _photonView.RPC("UpdateShadowHat", RpcTarget.All, hatIndex);
+        _photonView.RPC("UpdateBlobHat", RpcTarget.All, hatIndex);
+
     }
 
     public void CycleOutfit(bool up)
@@ -89,7 +97,8 @@ public class OutfitPicker : MonoBehaviour
                 outfitIndex = Outfits.Count - 1;
             }
         }
+        _photonView.RPC("UpdateShadowOutfit", RpcTarget.All, outfitIndex);
+        _photonView.RPC("UpdateBlobOutfit", RpcTarget.All, outfitIndex);
 
-        BM.outfitIndex = outfitIndex;
     }
 }

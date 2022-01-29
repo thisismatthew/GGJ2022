@@ -38,6 +38,10 @@ MonoBehaviour:
   - DestroySpaceship
   - Fire
   - RespawnSpaceship
+  - UpdateShadowHat
+  - UpdateShadowOutfit
+  - UpdateBlobHat
+  - UpdateBlobOutfit
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0

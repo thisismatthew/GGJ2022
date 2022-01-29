@@ -10,7 +10,8 @@ public class BlobManager : MonoBehaviour
     public TextMeshProUGUI TitleUI;
     public CinemachineVirtualCamera Cam;
     public GameObject PickerUI, PickingBackgroundUI;
-    public int hatIndex, outfitIndex;
+    public SpriteRenderer Hat, Outfit;
+    public List<Sprite> BlobHats, BlobOutfits;
 
     // Start is called before the first frame update
     void Start()
@@ -25,20 +26,16 @@ public class BlobManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    [PunRPC]
+    public void UpdateBlobOutfit(int outfitIndex)
     {
-        
+        Outfit.sprite = BlobOutfits[outfitIndex];
     }
 
-    public int GetCurrentHatIndex()
+    [PunRPC]
+    public void UpdateBlobHat(int hatIndex)
     {
-        return hatIndex;
-    }
-
-    public int GetCurrentOutfitIndex()
-    {
-        return outfitIndex;
+        Hat.sprite = BlobHats[hatIndex];
     }
 
     public void OnBlobReady()
