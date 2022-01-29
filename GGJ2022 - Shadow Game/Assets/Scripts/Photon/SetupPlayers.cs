@@ -9,8 +9,8 @@ public class SetupPlayers : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (PhotonNetwork.NickName == "Shadow") { shadowPrefab.SetActive(true); }
-        if (PhotonNetwork.NickName == "Blob") { blobPrefab.SetActive(true); }
+       /* if (PhotonNetwork.NickName == "Shadow") { shadowPrefab.SetActive(true); }
+        if (PhotonNetwork.NickName == "Blob") { blobPrefab.SetActive(true); }*/
 
     }
 
