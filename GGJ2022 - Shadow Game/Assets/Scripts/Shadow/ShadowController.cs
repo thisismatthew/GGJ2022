@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class PlayerMovement : MonoBehaviour
+public class ShadowController : MonoBehaviour
 {
     // Start is called before the first frame update
     public float CharacterSpeed;
@@ -20,6 +21,8 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (PhotonNetwork.NickName != "Shadow") return;
+
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
 
@@ -29,12 +32,10 @@ public class PlayerMovement : MonoBehaviour
         {
             Moving = true;
             rb.velocity = inputDir * CharacterSpeed;
-            //rb.MovePosition((Vector2)transform.position + (inputDir * CharacterSpeed));
         }
         else
         {
             Moving = false;
-            //GetComponent<SpriteRenderer>().color = c_stopped;
             rb.velocity = Vector2.zero;
         }
     }

@@ -10,30 +10,39 @@ public class ShadowManager : MonoBehaviour
 
     public CinemachineVirtualCamera Cam;
     public GameObject ShadowUI;
-    public PlayerMovement PlayerMover;
+    public ShadowController Controller;
     public Color MovingClr, StoppedClr;
+
+    private int currentHatIndex, currentOutfitIndex;
+    public int newHatIndex, newOutfitIndex;
 
     public List<Sprite> ShadowHats;
     public List<Sprite> ShadowOutfits;
+
+    private PhotonView _photonView;
 
     public SpriteRenderer Hat,Outfit,Face;
 
     // Start is called before the first frame update
     void Start()
     {
+        _photonView = PhotonView.Get(this);
         //first for blob player we want to make sure thier cam is in the right place and they have the right UI displaying
         if (PhotonNetwork.NickName == "Shadow")
         {
             Cam.m_Priority = 10;
+            Cam.LookAt = Controller.gameObject.transform;
+            Cam.Follow = Controller.gameObject.transform;
             ShadowUI.SetActive(true);
+            
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        SpriteRenderer[] sprites = PlayerMover.GetComponentsInChildren<SpriteRenderer>();
-        if (PlayerMover.Moving)
+        SpriteRenderer[] sprites = Controller.GetComponentsInChildren<SpriteRenderer>();
+        if (Controller.Moving)
         {
              foreach(SpriteRenderer spr in sprites)
              {
@@ -48,6 +57,23 @@ public class ShadowManager : MonoBehaviour
             }
         }
         Face.color = StoppedClr;
+
+        CheckForOutfitUpdate();
+    }
+
+    public void CheckForOutfitUpdate()
+    {
+        if (currentHatIndex != newHatIndex)
+        {
+            currentHatIndex = newHatIndex;
+            _photonView.RPC("UpdateShadowHat", RpcTarget.All, currentHatIndex);
+        }
+
+        if (currentOutfitIndex != newOutfitIndex)
+        {
+            currentOutfitIndex = newOutfitIndex;
+            _photonView.RPC("UpdateShadowOutfit", RpcTarget.All, currentOutfitIndex);
+        }
     }
 
     [PunRPC]

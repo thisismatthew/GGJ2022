@@ -20,6 +20,7 @@ public class OutfitPicker : MonoBehaviour
 {
     private PhotonView _photonView;
     public BlobManager BM;
+    public ShadowManager SM;
 
     public List<GameObject> Hats;
     public List<GameObject> Outfits;
@@ -74,8 +75,8 @@ public class OutfitPicker : MonoBehaviour
                 hatIndex = Hats.Count - 1;
             }
         }
-        _photonView.RPC("UpdateShadowHat", RpcTarget.All, hatIndex);
-        _photonView.RPC("UpdateBlobHat", RpcTarget.All, hatIndex);
+        BM.newHatIndex = hatIndex;
+        SM.newHatIndex = hatIndex;
 
     }
 
@@ -97,8 +98,8 @@ public class OutfitPicker : MonoBehaviour
                 outfitIndex = Outfits.Count - 1;
             }
         }
-        _photonView.RPC("UpdateShadowOutfit", RpcTarget.All, outfitIndex);
-        _photonView.RPC("UpdateBlobOutfit", RpcTarget.All, outfitIndex);
+        BM.newOutfitIndex = outfitIndex;
+        SM.newOutfitIndex = outfitIndex;
 
     }
 }

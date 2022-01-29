@@ -4,6 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using Photon.Pun;
 using TMPro;
+using System.Threading.Tasks;
 public class BlobManager : MonoBehaviour
 {
     //get it working offline then we'll work out how to post a data packet to the game manager;
@@ -11,11 +12,17 @@ public class BlobManager : MonoBehaviour
     public CinemachineVirtualCamera Cam;
     public GameObject PickerUI, PickingBackgroundUI;
     public SpriteRenderer Hat, Outfit;
+    private int currentHatIndex, currentOutfitIndex;
+    public int newHatIndex, newOutfitIndex;
     public List<Sprite> BlobHats, BlobOutfits;
+    private PhotonView _photonView;
+    public BlobController controller;
+    public bool ClothesReady = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        _photonView = PhotonView.Get(this);
         //first for blob player we want to make sure thier cam is in the right place and they have the right UI displaying
         if (PhotonNetwork.NickName == "Blob")
         {
@@ -24,6 +31,23 @@ public class BlobManager : MonoBehaviour
             PickingBackgroundUI.SetActive(true);
             TitleUI.text = "<wiggle>Choose Your Outfit...";
         }
+    }
+
+    private void Update()
+    {
+        //when hatIndex changes we want to update all views with the new info
+        if (currentHatIndex!= newHatIndex)
+        {
+            currentHatIndex = newHatIndex;
+            _photonView.RPC("UpdateBlobHat", RpcTarget.All, currentHatIndex);
+        }
+
+        if (currentOutfitIndex != newOutfitIndex)
+        {
+            currentOutfitIndex = newOutfitIndex;
+            _photonView.RPC("UpdateBlobOutfit", RpcTarget.All, currentOutfitIndex);
+        }
+
     }
 
     [PunRPC]
@@ -38,10 +62,21 @@ public class BlobManager : MonoBehaviour
         Hat.sprite = BlobHats[hatIndex];
     }
 
+    //TODO Wait for dialogue event
     public void OnBlobReady()
     {
+        PickerUI.SetActive(false);
+        PickingBackgroundUI.SetActive(false);
+        Cam.Follow = controller.gameObject.transform;
+        Cam.LookAt = controller.gameObject.transform;
+        ClothesReady = true;
         //create data packet to send to game manager with outfit details
         //signal that the hider only has a few moments to hide
         //put up a counter for both players. 
+    }
+
+    public async Task WaitForPick()
+    {
+        while (!ClothesReady) await Task.Yield(); 
     }
 }
