@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Cinemachine;
 using Photon.Pun;
 using TMPro;
@@ -12,6 +13,7 @@ public class BlobManager : MonoBehaviour
     public CinemachineVirtualCamera Cam;
     public GameObject PickerUI, PickingBackgroundUI;
     public SpriteRenderer Hat, Outfit;
+    public Image DialogueHead;
     private int currentHatIndex, currentOutfitIndex;
     public int newHatIndex, newOutfitIndex;
     public List<Sprite> BlobHats, BlobOutfits;
@@ -60,6 +62,7 @@ public class BlobManager : MonoBehaviour
     public void UpdateBlobHat(int hatIndex)
     {
         Hat.sprite = BlobHats[hatIndex];
+        DialogueHead.sprite = BlobHats[hatIndex];
     }
 
     //TODO Wait for dialogue event

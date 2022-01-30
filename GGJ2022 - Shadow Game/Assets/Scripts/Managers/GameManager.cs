@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 {
     public BlobManager bm;
     public ShadowManager sm;
+    public DialogueManager dm;
     private PhotonView _photonView;
     public PhotonTimer timer;
     
@@ -40,7 +41,10 @@ public class GameManager : MonoBehaviour
         if (newState == GameStates.OutfitPicking)
         {
             
-            //bm.controller.gameObject.SetActive(false);
+            bm.controller.gameObject.SetActive(false);
+            dm.StartDialogueEvent("test");
+            Task dialogue = dm.WaitForEventComplete();
+            Debug.Log("done with dialogue");
             Task picking = bm.WaitForPick();
             await picking;
             //go to next state for everyone.
@@ -79,10 +83,12 @@ public class GameManager : MonoBehaviour
         if (newState == GameStates.ShadowVictory)
         {
             Debug.Log("ShadowWins");
+            //ShadowWinDialogue
         }
         if (newState == GameStates.BlobVictory)
         {
             Debug.Log("blobwins");
+            //blobwinDialogue
         }
 
     }

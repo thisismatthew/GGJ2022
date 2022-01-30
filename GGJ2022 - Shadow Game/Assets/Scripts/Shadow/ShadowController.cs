@@ -18,6 +18,11 @@ public class ShadowController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        _photonView = PhotonView.Get(this);
+        if (PhotonNetwork.NickName != "Shadow") return;
+        Debug.Log("Transfer Ownership to:" + PhotonNetwork.LocalPlayer);
+        _photonView.TransferOwnership(PhotonNetwork.LocalPlayer);
+
     }
 
     // Update is called once per frame

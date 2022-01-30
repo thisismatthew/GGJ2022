@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Cinemachine;
 using Photon.Pun;
 
@@ -21,7 +22,8 @@ public class ShadowManager : MonoBehaviour
 
     private PhotonView _photonView;
 
-    public SpriteRenderer Hat,Outfit,Face;
+    public SpriteRenderer Hat, Outfit, Face;
+    public Image DialogueHat;
 
     // Start is called before the first frame update
     void Start()
@@ -86,5 +88,6 @@ public class ShadowManager : MonoBehaviour
     public void UpdateShadowHat(int hatIndex)
     {
         Hat.sprite = ShadowHats[hatIndex];
+        DialogueHat.sprite = ShadowHats[hatIndex];
     }
 }
