@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 
 public enum GameStates
@@ -24,10 +25,15 @@ public class GameManager : MonoBehaviour
     public PhotonTimer timer;
     private List<Task> activeTasks;
     private bool isBlob = true;
-    
+    public GameStates currentState;
+    private ExitGames.Client.Photon.Hashtable _myCustomProperties = new ExitGames.Client.Photon.Hashtable();
+    private bool synced = false;
+
     // Start is called before the first frame update
     void Start()
     {
+        FindObjectOfType<AudioManager>().StopAll();
+        activeTasks = new List<Task>();
         if (PhotonNetwork.NickName == "Shadow") isBlob = false;
         _photonView = PhotonView.Get(this);
         _photonView.RPC("EnterGameState", RpcTarget.All, GameStates.OutfitPicking);
@@ -40,28 +46,55 @@ public class GameManager : MonoBehaviour
 
     [PunRPC]
     public async void EnterGameState(GameStates newState)
-    { 
+    {
+        currentState = newState;
         if (newState == GameStates.OutfitPicking)
         {
             activeTasks.Clear();
-
-            //start the shadow dialogue
             bm.controller.gameObject.SetActive(false);
 
-            //add tasks needed for this state
-            activeTasks.Add(bm.WaitForPick());
-            dm.StartDialogueEvent("test");
-            activeTasks.Add(dm.WaitForEventComplete());
+            //starting dialogues - asyncronous
+            if (isBlob)
+            {
+                FindObjectOfType<AudioManager>().Play("blob_pick");
+                dm.EnableDialogue(true);
+                dm.StartDialogueEvent("blobIntro"); //BLOB
+            }
+            else
+            {
+                FindObjectOfType<AudioManager>().Play("shadow_pick");
+                dm.EnableDialogue(false);
+                dm.StartDialogueEvent("shadowIntro"); //SHADOW
+            }
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
 
+
+            await bm.WaitForPick();
+            //Post Picking Dialogues - asynchronous 
+            if (isBlob)
+            {
+                dm.EnableDialogue(true);
+                dm.StartDialogueEvent("blobDressed"); //BLOB
+            }
+            
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
+
+            //TODO - SYNCING STATES
             //when all tasks are done we send for the next state;
-            await Task.WhenAll(activeTasks);
             _photonView.RPC("EnterGameState",RpcTarget.All, GameStates.ShadowHiding);
         }
         if (newState == GameStates.ShadowHiding)
         {
             activeTasks.Clear();
-            //start dialogue task for blob
-            //start dialogue task for shadow
+            if(!isBlob)
+            {
+                FindObjectOfType<AudioManager>().StopAll();
+                FindObjectOfType<AudioManager>().Play("shadow_hide");
+                dm.EnableDialogue(false);
+                dm.StartDialogueEvent("shadowHiding"); //SHADOW
+            }
             timer.SetTimer(10);
             activeTasks.Add(WaitForTimer());
 
@@ -71,12 +104,35 @@ public class GameManager : MonoBehaviour
         }
         if (newState == GameStates.BlobSeeking)
         {
-            //start dialogue for blob&shadow
             //lock the shadows movement & enter the blob
             bm.PickerUI.SetActive(false);
             bm.PickingBackgroundUI.SetActive(false);
             sm.Controller.enabled = false;
+
+
+            //SYNCHRONOUS DIALOGUE
+            dm.EnableDialogue(true);
+            dm.StartDialogueEvent("blobEnters");
+            if (isBlob)
+            {
+                FindObjectOfType<AudioManager>().StopAll();
+                FindObjectOfType<AudioManager>().Play("blob_seek");
+            }
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
+
+            dm.EnableDialogue(false);
+            dm.StartDialogueEvent("shadowLaughs");
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
+
+
             bm.controller.gameObject.SetActive(true);
+
+
+
+
+            //StartHuntTimer
             timer.SetTimer(20);
             Task countdown = WaitForTimer();
             await countdown; //once timer is up 
@@ -92,14 +148,59 @@ public class GameManager : MonoBehaviour
         if (newState == GameStates.ShadowVictory)
         {
             Debug.Log("ShadowWins");
-            //ShadowWinDialogue
+
+            //SYNCHRONOUS DIALOGUE
+            dm.EnableDialogue(true);
+            dm.StartDialogueEvent("blobLoses");
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
+            dm.EnableDialogue(false);
+            dm.StartDialogueEvent("shadowLaughs");
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
+
+            SwapAndReload();
         }
         if (newState == GameStates.BlobVictory)
         {
             Debug.Log("blobwins");
             //blobwinDialogue
-        }
+            //SYNCHRONOUS DIALOGUE
+            dm.EnableDialogue(true);
+            dm.StartDialogueEvent("blobWins");
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
+            dm.EnableDialogue(false);
+            dm.StartDialogueEvent("ShadowLoses");
+            await dm.WaitForEventComplete();
+            dm.DisableDialogue();
 
+            SwapAndReload();
+        }
+    }
+
+
+   /* public async Task WaitForStateSync()
+    {
+        while (!synced) {
+            foreach(PhotonNetwork.PlayPhotonNetwork.PlayerListOthers)
+            await Task.Yield();
+        } 
+        
+        Debug.Log("Synced For: " + PhotonNetwork.NickName);
+    }*/
+
+    public void SwapAndReload()
+    {
+        if (isBlob)
+        {
+            PhotonNetwork.NickName = "Shadow";
+        }
+        else
+        {
+            PhotonNetwork.NickName = "Blob";
+        }
+        SceneManager.LoadScene("Game");
     }
 
     public async Task WaitForTimer()

@@ -35,7 +35,7 @@ public class ShadowManager : MonoBehaviour
             Cam.m_Priority = 10;
             Cam.LookAt = Controller.gameObject.transform;
             Cam.Follow = Controller.gameObject.transform;
-            ShadowUI.SetActive(true);
+            //ShadowUI.SetActive(true);
             
         }
     }

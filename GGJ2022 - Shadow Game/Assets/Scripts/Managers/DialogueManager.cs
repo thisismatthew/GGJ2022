@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Febucci.UI;
+using UnityEngine.UI;
 using System.Threading.Tasks;
 
 [System.Serializable]
@@ -17,6 +18,7 @@ public class DialogueManager : MonoBehaviour
     private TextMeshProUGUI textMeshPro;
     private TextAnimatorPlayer textAnimatorPlayer;
     public DialogueEvent[] Events;
+    public Image ShadowHead, BlobFace, DialogueUI;
     private Dictionary<string, List<string>> DialogueBlocks;
     private bool eventActive = false;
     public bool blockActive = false;
@@ -30,10 +32,10 @@ public class DialogueManager : MonoBehaviour
         DialogueBlocks = new Dictionary<string, List<string>>();
         foreach(DialogueEvent e in Events)
         {
-            for (int i = 0; i < e.blocks.Count - 1; i++)
+/*            for (int i = 0; i < e.blocks.Count - 1; i++)
             {
                 e.blocks[i] += "<?end>";
-            }
+            }*/
             DialogueBlocks.Add(e.name, e.blocks);
         }
         textAnimatorPlayer.textAnimator.onEvent += OnEvent;
@@ -42,10 +44,8 @@ public class DialogueManager : MonoBehaviour
     {
         eventActive = true;
         currentEvent = eventName;
-        /*if (!DialogueBlocks.ContainsKey(eventName))
-        {
-            Debug.LogError("no dialogue event for key: " + eventName);
-        }*/
+        eventIndex = 0;
+
     }
 
     private void Update()
@@ -77,9 +77,9 @@ public class DialogueManager : MonoBehaviour
         switch (message)
         {
             case "end":
-                eventIndex++;
                 Task waiter = WaitForInputOrSeconds(2f);
                 await waiter;
+                eventIndex++;
                 //start an async that waits for input
                 blockActive = false;
                 break;
@@ -100,4 +100,22 @@ public class DialogueManager : MonoBehaviour
         while (eventActive) await Task.Yield();
     }
 
+    public void EnableDialogue(bool blob)
+    {
+        DialogueUI.gameObject.SetActive(true);
+        if (blob)
+        {
+            BlobFace.gameObject.SetActive(true);
+        }
+        else
+        {
+            ShadowHead.gameObject.SetActive(true);
+        }
+    }
+    public void DisableDialogue()
+    {
+        DialogueUI.gameObject.SetActive(false);
+        BlobFace.gameObject.SetActive(false);
+        ShadowHead.gameObject.SetActive(false);
+    }
 }
