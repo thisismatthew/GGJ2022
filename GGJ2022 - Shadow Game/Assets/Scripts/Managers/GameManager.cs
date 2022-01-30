@@ -22,10 +22,13 @@ public class GameManager : MonoBehaviour
     public DialogueManager dm;
     private PhotonView _photonView;
     public PhotonTimer timer;
+    private List<Task> activeTasks;
+    private bool isBlob = true;
     
     // Start is called before the first frame update
     void Start()
     {
+        if (PhotonNetwork.NickName == "Shadow") isBlob = false;
         _photonView = PhotonView.Get(this);
         _photonView.RPC("EnterGameState", RpcTarget.All, GameStates.OutfitPicking);
     }
@@ -40,24 +43,30 @@ public class GameManager : MonoBehaviour
     { 
         if (newState == GameStates.OutfitPicking)
         {
-            
+            activeTasks.Clear();
+
+            //start the shadow dialogue
             bm.controller.gameObject.SetActive(false);
+
+            //add tasks needed for this state
+            activeTasks.Add(bm.WaitForPick());
             dm.StartDialogueEvent("test");
-            Task dialogue = dm.WaitForEventComplete();
-            Debug.Log("done with dialogue");
-            Task picking = bm.WaitForPick();
-            await picking;
-            //go to next state for everyone.
-            //disable blob movement and hide blob body
+            activeTasks.Add(dm.WaitForEventComplete());
+
+            //when all tasks are done we send for the next state;
+            await Task.WhenAll(activeTasks);
             _photonView.RPC("EnterGameState",RpcTarget.All, GameStates.ShadowHiding);
         }
         if (newState == GameStates.ShadowHiding)
         {
+            activeTasks.Clear();
             //start dialogue task for blob
             //start dialogue task for shadow
             timer.SetTimer(10);
-            Task countdown = WaitForTimer();
-            await countdown; //once timer is up 
+            activeTasks.Add(WaitForTimer());
+
+
+            await Task.WhenAll(activeTasks);
             _photonView.RPC("EnterGameState", RpcTarget.All, GameStates.BlobSeeking);
         }
         if (newState == GameStates.BlobSeeking)

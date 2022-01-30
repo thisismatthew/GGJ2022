@@ -6614,20 +6614,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogueHolder: {fileID: 1327020426}
   Events:
-  - name: test
+  - name: shadowIntro
     blocks:
-    - Hey now this is some text!<?end>
-    - more text!<?end>
-    - final text...<?end>
-    - now...<?end>
-    - blah...<?end>
-    - blah...<?end>
-    - blah...<?end>
-    - blah...<?end>
-    - blah...<?end>
-    - blah...<?end>
-    - blah...<?end>
-    - blah...<?end>
+    - Must escape.
+    - 'Must be free. '
+    - "Then\u2026shadow WILL split from boring body!!"
+    - Quick.
+  - name: blobIntro
+    blocks:
+    - I blob. But what blob I be today?
+  - name: blobDressed
+    blocks:
+    - "U know\u2026 blob\u2019s life not easy."
+    - Very alone much time
+    - "But at least\u2026always have self and self\u2019s shadow"
+  - name: shadowHiding
+    blocks:
+    - "Ugh\u2026stupid body changed shape again\u2026"
+    - "Maybe need new hide spot\u2026?"
+    - Quick!
+  - name: blobEnters
+    blocks:
+    - ???
+    - Wha - where my shadow?
+  - name: shadowLaughs
+    blocks:
+    - ' Hehehehe'
+  - name: blobSad
+    blocks:
+    - ' Hehehehe'
+  - name: ':( '
+    blocks:
+    - ' Hehehehe'
+  - name: shadowWins
+    blocks:
+    - Hehehe!
+    - See you never you old [MADLIB TITLE]!
+  - name: blobLoses
+    blocks:
+    - My only friend!
+  - name: blobWins
+    blocks:
+    - ' I happy Blob!'
+    - ' I [MADLIB TITLE]'
+  - name: shadowLoses
+    blocks:
+    - Ugh
   blockActive: 0
 --- !u!4 &2127184766
 Transform:

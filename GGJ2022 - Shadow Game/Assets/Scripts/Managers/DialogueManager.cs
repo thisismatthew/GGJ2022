@@ -30,6 +30,10 @@ public class DialogueManager : MonoBehaviour
         DialogueBlocks = new Dictionary<string, List<string>>();
         foreach(DialogueEvent e in Events)
         {
+            for (int i = 0; i < e.blocks.Count - 1; i++)
+            {
+                e.blocks[i] += "<?end>";
+            }
             DialogueBlocks.Add(e.name, e.blocks);
         }
         textAnimatorPlayer.textAnimator.onEvent += OnEvent;
