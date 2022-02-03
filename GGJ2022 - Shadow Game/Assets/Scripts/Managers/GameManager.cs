@@ -4,10 +4,12 @@ using UnityEngine;
 using Photon.Pun;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
-
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Photon.Realtime;
 
 public enum GameStates
 {
+    Initialising,
     OutfitPicking,
     ShadowHiding,
     BlobSeeking,
@@ -23,9 +25,11 @@ public class GameManager : MonoBehaviour
     public DialogueManager dm;
     private PhotonView _photonView;
     public PhotonTimer timer;
+    public GameObject InitialisingUI;
     private List<Task> activeTasks;
     private bool isBlob = true;
     public GameStates currentState;
+    private GameStates otherState = GameStates.Initialising;
     private ExitGames.Client.Photon.Hashtable _myCustomProperties = new ExitGames.Client.Photon.Hashtable();
     private bool synced = false;
 
@@ -40,6 +44,7 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
+        if (otherState != GameStates.Initialising) InitialisingUI.SetActive(false);
         Physics2D.IgnoreCollision(bm.controller.GetComponent<CapsuleCollider2D>(), sm.Controller.GetComponent<CapsuleCollider2D>(), true);
     }
 
@@ -48,6 +53,9 @@ public class GameManager : MonoBehaviour
     public async void EnterGameState(GameStates newState)
     {
         currentState = newState;
+        _photonView.RPC("UpdateOtherOfGameState", RpcTarget.Others, currentState);
+        await WaitForStateSync();
+
         if (newState == GameStates.OutfitPicking)
         {
             activeTasks.Clear();
@@ -171,7 +179,7 @@ public class GameManager : MonoBehaviour
             await dm.WaitForEventComplete();
             dm.DisableDialogue();
             dm.EnableDialogue(false);
-            dm.StartDialogueEvent("ShadowLoses");
+            dm.StartDialogueEvent("shadowLoses");
             await dm.WaitForEventComplete();
             dm.DisableDialogue();
 
@@ -180,15 +188,23 @@ public class GameManager : MonoBehaviour
     }
 
 
-   /* public async Task WaitForStateSync()
+    public async Task WaitForStateSync()
     {
-        while (!synced) {
-            foreach(PhotonNetwork.PlayPhotonNetwork.PlayerListOthers)
+        //Debug.Log("WaitOnSync Called");
+        while (otherState != currentState)
+        {
+            Debug.Log(PhotonNetwork.NickName + " is waiting to start " + currentState);
             await Task.Yield();
-        } 
-        
-        Debug.Log("Synced For: " + PhotonNetwork.NickName);
-    }*/
+        }
+        Debug.Log("Synced");
+    }
+
+    [PunRPC]
+    private void UpdateOtherOfGameState(GameStates state)
+    {
+        Debug.Log("otherState Updated");
+        otherState = state;
+    }
 
     public void SwapAndReload()
     {
