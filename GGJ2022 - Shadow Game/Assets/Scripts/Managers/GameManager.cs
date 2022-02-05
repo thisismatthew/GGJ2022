@@ -40,11 +40,15 @@ public class GameManager : MonoBehaviour
         activeTasks = new List<Task>();
         if (PhotonNetwork.NickName == "Shadow") isBlob = false;
         _photonView = PhotonView.Get(this);
-        _photonView.RPC("EnterGameState", RpcTarget.All, GameStates.OutfitPicking);
+        EnterGameState(GameStates.OutfitPicking);
     }
     private void Update()
     {
         if (otherState != GameStates.Initialising) InitialisingUI.SetActive(false);
+        if (otherState == GameStates.Initialising)
+        {
+            _photonView.RPC("UpdateOtherOfGameState", RpcTarget.Others, currentState);
+        }
         Physics2D.IgnoreCollision(bm.controller.GetComponent<CapsuleCollider2D>(), sm.Controller.GetComponent<CapsuleCollider2D>(), true);
     }
 
@@ -91,7 +95,8 @@ public class GameManager : MonoBehaviour
 
             //TODO - SYNCING STATES
             //when all tasks are done we send for the next state;
-            _photonView.RPC("EnterGameState",RpcTarget.All, GameStates.ShadowHiding);
+            EnterGameState(GameStates.ShadowHiding);
+            return;
         }
         if (newState == GameStates.ShadowHiding)
         {
@@ -108,7 +113,8 @@ public class GameManager : MonoBehaviour
 
 
             await Task.WhenAll(activeTasks);
-            _photonView.RPC("EnterGameState", RpcTarget.All, GameStates.BlobSeeking);
+            EnterGameState(GameStates.BlobSeeking);
+            return;
         }
         if (newState == GameStates.BlobSeeking)
         {
@@ -128,7 +134,6 @@ public class GameManager : MonoBehaviour
             }
             await dm.WaitForEventComplete();
             dm.DisableDialogue();
-
             dm.EnableDialogue(false);
             dm.StartDialogueEvent("shadowLaughs");
             await dm.WaitForEventComplete();
@@ -144,13 +149,16 @@ public class GameManager : MonoBehaviour
             timer.SetTimer(20);
             Task countdown = WaitForTimer();
             await countdown; //once timer is up 
+            if (!isBlob) return;
             if (bm.controller.Detector.OnShadow)
             {
                 _photonView.RPC("EnterGameState", RpcTarget.All, GameStates.BlobVictory);
+                return;
             }
             else
             {
                 _photonView.RPC("EnterGameState", RpcTarget.All, GameStates.ShadowVictory);
+                return;
             }
         }
         if (newState == GameStates.ShadowVictory)

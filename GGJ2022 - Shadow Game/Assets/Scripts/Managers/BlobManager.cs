@@ -66,9 +66,11 @@ public class BlobManager : MonoBehaviour
     }
 
     //TODO Wait for dialogue event
+    [PunRPC]
     public void OnBlobReady()
     {
         ClothesReady = true;
+        _photonView.RPC("OnBlobReady", RpcTarget.Others);
     }
 
     public async Task WaitForPick()
